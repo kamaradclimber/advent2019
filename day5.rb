@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
-input = DATA.read.split(",").map(&:to_i)
+input = DATA.read.split(',').map(&:to_i)
 input_copy = input.dup
 
 def debug(s)
   puts s if ENV['DEBUG']
 end
-
 
 def read_param(param_mode, input, index)
   case param_mode
@@ -22,7 +21,7 @@ def read_param(param_mode, input, index)
 end
 
 def read_next(input, index, intake)
-  puts input[index..(index+intake-1)].join(' ') if ENV['DEBUG']
+  puts input[index..(index + intake - 1)].join(' ') if ENV['DEBUG']
 end
 
 def step(index, input, stdin: [], stdout: [])
@@ -32,72 +31,77 @@ def step(index, input, stdin: [], stdout: [])
   print "Opcode is #{opcode} " if ENV['DEBUG']
   case opcode
   when 1
-    debug "addition"
-    raise "Wrong param mode for output" if modes[2] != 0
-    old_value = input[input[index+3]]
-    input[input[index+3]] = read_param(modes[0], input, index+1) + read_param(modes[1], input, index+2)
-    puts "Putting #{input[input[index+3]]} at index #{input[index+3]} where previous value was #{old_value}" if ENV['DEBUG']
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'addition'
+    raise 'Wrong param mode for output' if modes[2] != 0
+
+    old_value = input[input[index + 3]]
+    input[input[index + 3]] = read_param(modes[0], input, index + 1) + read_param(modes[1], input, index + 2)
+    puts "Putting #{input[input[index + 3]]} at index #{input[index + 3]} where previous value was #{old_value}" if ENV['DEBUG']
+    # puts input.join(",") if ENV['DEBUG']
     4
   when 2
-    debug "multiplication"
-    raise "Wrong param mode for output" if modes[2] != 0
-    input[input[index+3]] = read_param(modes[0], input, index+1) * read_param(modes[1], input, index+2)
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'multiplication'
+    raise 'Wrong param mode for output' if modes[2] != 0
+
+    input[input[index + 3]] = read_param(modes[0], input, index + 1) * read_param(modes[1], input, index + 2)
+    # puts input.join(",") if ENV['DEBUG']
     4
   when 3
-    debug "stdin"
-    raise "Already consumed stdin" if stdin.empty?
-    raise "Wrong param mode for output" if modes[0] != 0
-    old_value = input[input[index+1]]
-    input[input[index+1]] = stdin.pop
-    puts "Writting stdin #{input[input[index+1]]} to index #{input[index+1]} where previous value was #{old_value}" if ENV['DEBUG']
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'stdin'
+    raise 'Already consumed stdin' if stdin.empty?
+    raise 'Wrong param mode for output' if modes[0] != 0
+
+    old_value = input[input[index + 1]]
+    input[input[index + 1]] = stdin.pop
+    puts "Writting stdin #{input[input[index + 1]]} to index #{input[index + 1]} where previous value was #{old_value}" if ENV['DEBUG']
+    # puts input.join(",") if ENV['DEBUG']
     2
   when 4
-    debug "stdout"
-    stdout << read_param(modes[0], input, index+1)
+    debug 'stdout'
+    stdout << read_param(modes[0], input, index + 1)
     puts "STDOUT: #{stdout.join(',')}" if ENV['DEBUG']
     2
   when 5
-    debug "jump-if-true"
-    if read_param(modes[0], input, index+1) != 0
-      puts "Jumping to #{read_param(modes[1], input, index+2)}" if ENV['DEBUG']
-      #puts input.join(",") if ENV['DEBUG']
-      read_param(modes[1], input, index+2) - index
+    debug 'jump-if-true'
+    if read_param(modes[0], input, index + 1) != 0
+      puts "Jumping to #{read_param(modes[1], input, index + 2)}" if ENV['DEBUG']
+      # puts input.join(",") if ENV['DEBUG']
+      read_param(modes[1], input, index + 2) - index
     else
-      puts "Not jumping" if ENV['DEBUG']
+      puts 'Not jumping' if ENV['DEBUG']
       3
     end
   when 6
-    debug "jump-if-false"
-    if read_param(modes[0], input, index+1) == 0
-      puts "Jumping to #{read_param(modes[1], input, index+2)}" if ENV['DEBUG']
-      #puts input.join(",") if ENV['DEBUG']
-      read_param(modes[1], input, index+2) - index
+    debug 'jump-if-false'
+    if read_param(modes[0], input, index + 1) == 0
+      puts "Jumping to #{read_param(modes[1], input, index + 2)}" if ENV['DEBUG']
+      # puts input.join(",") if ENV['DEBUG']
+      read_param(modes[1], input, index + 2) - index
     else
-      puts "Not jumping" if ENV['DEBUG']
+      puts 'Not jumping' if ENV['DEBUG']
       3
     end
   when 7
-    debug "lower-than"
-    raise "Wrong param mode for output" if modes[2] != 0
-    a = read_param(modes[0], input, index+1)
-    b = read_param(modes[1], input, index+2)
-    input[input[index+3]] = a < b ? 1 : 0 
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'lower-than'
+    raise 'Wrong param mode for output' if modes[2] != 0
+
+    a = read_param(modes[0], input, index + 1)
+    b = read_param(modes[1], input, index + 2)
+    input[input[index + 3]] = a < b ? 1 : 0
+    # puts input.join(",") if ENV['DEBUG']
     4
   when 8
-    debug "equal"
-    raise "Wrong param mode for output" if modes[2] != 0
-    a = read_param(modes[0], input, index+1)
-    b = read_param(modes[1], input, index+2)
-    input[input[index+3]] = a == b ? 1 : 0 
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'equal'
+    raise 'Wrong param mode for output' if modes[2] != 0
+
+    a = read_param(modes[0], input, index + 1)
+    b = read_param(modes[1], input, index + 2)
+    input[input[index + 3]] = a == b ? 1 : 0
+    # puts input.join(",") if ENV['DEBUG']
     4
   when 99
-    debug "Halt!" if ENV['DEBUG']
-    #puts input.join(",") if ENV['DEBUG']
+    debug 'Halt!' if ENV['DEBUG']
+    # puts input.join(",") if ENV['DEBUG']
     false
   else
     raise "Error with unknown opcode #{opcode} at #{index}"
@@ -105,102 +109,102 @@ def step(index, input, stdin: [], stdout: [])
 end
 
 def iterate(input, stdin: [], stdout: [])
-  #puts input.join(",") if ENV['DEBUG']
+  # puts input.join(",") if ENV['DEBUG']
   i = 0
   increment = 0
   while (increment = step(i, input, stdin: stdin, stdout: stdout))
-    puts "Moving cursor from #{i} to #{i+increment}" if ENV['DEBUG']
+    puts "Moving cursor from #{i} to #{i + increment}" if ENV['DEBUG']
     i += increment
   end
   input
 end
 
-example = [1,9,10,3,2,3,11,0,99,30,40,50]
+example = [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50]
 iterate(example)
 
-raise "Bad example1" unless iterate([1,0,0,0,99]) == [2,0,0,0,99]
-raise "Bad example2" unless iterate([2,3,0,3,99]) == [2,3,0,6,99]
-raise "Bad example3" unless iterate([2,4,4,5,99,0]) == [2,4,4,5,99,9801]
-raise "Bad example4" unless iterate([1,1,1,4,99,5,6,0,99]) == [30,1,1,4,2,5,6,0,99]
+raise 'Bad example1' unless iterate([1, 0, 0, 0, 99]) == [2, 0, 0, 0, 99]
+raise 'Bad example2' unless iterate([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
+raise 'Bad example3' unless iterate([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
+raise 'Bad example4' unless iterate([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
 
 stdout = []
-raise "Bad example5" unless iterate([3,0,4,0,99], stdin: [42], stdout: stdout) == [42, 0,4,0,99]
-raise "Bad stdout" unless stdout == [42]
+raise 'Bad example5' unless iterate([3, 0, 4, 0, 99], stdin: [42], stdout: stdout) == [42, 0, 4, 0, 99]
+raise 'Bad stdout' unless stdout == [42]
 
-raise "Bad example6" unless iterate([1002,4,3,4,33]) == [1002, 4, 3, 4, 99]
+raise 'Bad example6' unless iterate([1002, 4, 3, 4, 33]) == [1002, 4, 3, 4, 99]
 
-raise "Bad example7" unless iterate([1101,100,-1,4,0]) == [1101,100,-1,4,99]
+raise 'Bad example7' unless iterate([1101, 100, -1, 4, 0]) == [1101, 100, -1, 4, 99]
 
 stdout = []
 iterate(input_copy, stdin: [1], stdout: stdout)
-raise "Bad diagnostic first part" if stdout[0..-1].all?(&:zero?)
+raise 'Bad diagnostic first part' if stdout[0..-1].all?(&:zero?)
+
 puts "First part: #{stdout.last}"
-raise "Regression on part 1 " unless stdout.last == 9431221
+raise 'Regression on part 1 ' unless stdout.last == 9_431_221
 
 stdout = []
-iterate([3,9,8,9,10,9,4,9,99,-1,8], stdout: stdout, stdin: [8]) 
-raise "Bad example8" unless stdout == [1]
-stdout = []
-iterate([3,9,8,9,10,9,4,9,99,-1,8], stdout: stdout, stdin: [7]) 
-raise "Bad example8bis" unless stdout == [0]
+iterate([3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8], stdout: stdout, stdin: [8])
+raise 'Bad example8' unless stdout == [1]
 
 stdout = []
-iterate([3,9,7,9,10,9,4,9,99,-1,8], stdout: stdout, stdin: [7])
-raise "Bad example9" unless stdout == [1]
-stdout = []
-iterate([3,9,7,9,10,9,4,9,99,-1,8], stdout: stdout, stdin: [8])
-raise "Bad example9bis" unless stdout == [0]
-stdout = []
-iterate([3,9,7,9,10,9,4,9,99,-1,8], stdout: stdout, stdin: [9])
-raise "Bad example9bis" unless stdout == [0]
+iterate([3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8], stdout: stdout, stdin: [7])
+raise 'Bad example8bis' unless stdout == [0]
 
 stdout = []
-iterate([3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9], stdout: stdout, stdin: [0])
-raise "Bad jump example" unless stdout == [0]
+iterate([3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8], stdout: stdout, stdin: [7])
+raise 'Bad example9' unless stdout == [1]
 
 stdout = []
-iterate([3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9], stdout: stdout, stdin: [1])
-raise "Bad jump example bis" unless stdout == [1]
+iterate([3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8], stdout: stdout, stdin: [8])
+raise 'Bad example9bis' unless stdout == [0]
 
 stdout = []
-iterate([3,3,1105,-1,9,1101,0,0,12,4,12,99,1], stdout: stdout, stdin: [0])
-raise "Bad jump example ter" unless stdout == [0]
+iterate([3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8], stdout: stdout, stdin: [9])
+raise 'Bad example9bis' unless stdout == [0]
 
 stdout = []
-iterate([3,3,1105,-1,9,1101,0,0,12,4,12,99,1], stdout: stdout, stdin: [1])
-raise "Bad jump example quatro" unless stdout == [1]
-
-
-stdout = []
-iterate([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], stdout: stdout, stdin: [7])
-raise "Bad full example" unless stdout == [999]
+iterate([3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9], stdout: stdout, stdin: [0])
+raise 'Bad jump example' unless stdout == [0]
 
 stdout = []
-iterate([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], stdout: stdout, stdin: [8])
-raise "Bad full example bis" unless stdout == [1000]
+iterate([3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9], stdout: stdout, stdin: [1])
+raise 'Bad jump example bis' unless stdout == [1]
 
 stdout = []
-iterate([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], stdout: stdout, stdin: [9])
-raise "Bad full example ter" unless stdout == [1001]
+iterate([3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1], stdout: stdout, stdin: [0])
+raise 'Bad jump example ter' unless stdout == [0]
 
 stdout = []
-iterate([3,3,1108,-1,8,3,4,3,99], stdout: stdout, stdin: [8])
-raise "Bad comparison example" unless stdout == [1]
+iterate([3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1], stdout: stdout, stdin: [1])
+raise 'Bad jump example quatro' unless stdout == [1]
 
 stdout = []
-iterate([3,3,1108,-1,8,3,4,3,99], stdout: stdout, stdin: [9])
-raise "Bad comparison example bis" unless stdout == [0]
-
-
-stdout = []
-iterate([3,3,1107,-1,8,3,4,3,99], stdout: stdout, stdin: [7])
-raise "Bad < example" unless stdout == [1]
+iterate([3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99], stdout: stdout, stdin: [7])
+raise 'Bad full example' unless stdout == [999]
 
 stdout = []
-iterate([3,3,1107,-1,8,3,4,3,99], stdout: stdout, stdin: [8])
-raise "Bad < example bis" unless stdout == [0]
+iterate([3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99], stdout: stdout, stdin: [8])
+raise 'Bad full example bis' unless stdout == [1000]
 
+stdout = []
+iterate([3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99], stdout: stdout, stdin: [9])
+raise 'Bad full example ter' unless stdout == [1001]
 
+stdout = []
+iterate([3, 3, 1108, -1, 8, 3, 4, 3, 99], stdout: stdout, stdin: [8])
+raise 'Bad comparison example' unless stdout == [1]
+
+stdout = []
+iterate([3, 3, 1108, -1, 8, 3, 4, 3, 99], stdout: stdout, stdin: [9])
+raise 'Bad comparison example bis' unless stdout == [0]
+
+stdout = []
+iterate([3, 3, 1107, -1, 8, 3, 4, 3, 99], stdout: stdout, stdin: [7])
+raise 'Bad < example' unless stdout == [1]
+
+stdout = []
+iterate([3, 3, 1107, -1, 8, 3, 4, 3, 99], stdout: stdout, stdin: [8])
+raise 'Bad < example bis' unless stdout == [0]
 
 puts '----------------------'
 ENV['DEBUG'] = ''

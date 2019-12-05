@@ -4,10 +4,10 @@ def fuel(mass)
   mass / 3 - 2
 end
 
-raise "Error example 12" unless fuel(12) == 2
-raise "Error example 14" unless fuel(14) == 2
-raise "Error example 1969" unless fuel(1969) == 654
-raise "Error example 100756" unless fuel(100756) == 33583
+raise 'Error example 12' unless fuel(12) == 2
+raise 'Error example 14' unless fuel(14) == 2
+raise 'Error example 1969' unless fuel(1969) == 654
+raise 'Error example 100756' unless fuel(100_756) == 33_583
 
 input = DATA.read.split("\n").map(&:to_i)
 
@@ -20,15 +20,16 @@ def total_fuel_computation(first_step)
   loop do
     extra = fuel(extra_fuel)
     break unless extra > 0
+
     total_fuel += extra
     extra_fuel = extra
-    #puts "extra: #{extra_fuel}, total: #{total_fuel}"
+    # puts "extra: #{extra_fuel}, total: #{total_fuel}"
   end
   total_fuel
 end
 
-raise "Error example 1969" unless total_fuel_computation(1969) == 966
-raise "Error example 100756" unless total_fuel_computation(100756) == 50346
+raise 'Error example 1969' unless total_fuel_computation(1969) == 966
+raise 'Error example 100756' unless total_fuel_computation(100_756) == 50_346
 
 second_step = input.map { |mod| total_fuel_computation(mod) }.sum
 puts "Second step: #{second_step}"
