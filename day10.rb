@@ -46,31 +46,6 @@ def best_location(asteroids)
   [best, values[best]]
 end
 
-#def best_location(asteroids)
-#  debug "#{asteroids.size} asteroids there"
-#  values = {}
-#  best = asteroids.max_by do |ast1|
-#    c = asteroids.reject { |ast2| ast1 == ast2 }.count do |ast2|
-#      v = visible?(ast1, ast2, asteroids)
-#      debug2 "#{ast1.join(',')} -> #{ast2.join(',')} : #{v}"
-#      v
-#    end
-#    debug "#{ast1.join(', ')}: #{c}"
-#    values[ast1] = c
-#    c
-#  end
-#  [best, values[best]]
-#end
-
-asteroids = read_input(<<~MAP)
-.#..#
-.....
-#####
-....#
-...##
-MAP
-raise "Failed example1" unless best_location(asteroids) == [[3,4], 8]
-
 asteroids = read_input(<<~MAP)
 ......#.#.
 #..#.#....
@@ -83,7 +58,6 @@ asteroids = read_input(<<~MAP)
 ##...#..#.
 .#....####
 MAP
-puts best_location(asteroids).join(':')
 raise "Failed example2" unless best_location(asteroids) == [[5,8], 33]
 
 asteroids = read_input(<<~MAP)
@@ -136,6 +110,7 @@ asteroids = read_input(<<~MAP)
 #.#.#.#####.####.###
 ###.##.####.##.#..##
 MAP
+asteroids_large = asteroids
 raise "Failed example5" unless best_location(asteroids) == [[11,13], 210]
 
 asteroids = read_input(DATA.read)
@@ -143,6 +118,38 @@ asteroids = read_input(DATA.read)
 puts "First part: #{best_location(asteroids)[1]}"
 
 
+def shoot(asteroids)
+  ast1, _ = best_location(asteroids)
+  values = {}
+  by_angle_and_distance = asteroids
+    .reject { |ast| ast == ast1 }
+    .map { |ast| polar_coords(ast1, ast) }
+    .group_by { |angle, r| angle.round(6) }
+    .transform_values { |asts| asts.sort_by { |angle, r|  r } }
+    .sort_by { |angle, asts| angle }
+    .to_h
+  orders = []
+  starting_index = by_angle_and_distance.keys.find_index { |angle, _| angle > -(Math::PI / 2) }
+  index = starting_index
+  while by_angle_and_distance.any? { |_, asts| asts.any? }
+    angle = by_angle_and_distance.keys[index % by_angle_and_distance.keys.size]
+    target = by_angle_and_distance[angle].shift
+    if target
+      orders << cart_coords(*target, ast1)
+    end
+    index += 1
+  end
+  orders
+end
+
+def cart_coords(angle, r, ref_ast)
+  x, y = ref_ast
+  [(r * Math.cos(angle) + x).round(0), (r * Math.sin(angle) + y).round(0)]
+end
+
+raise "Failed example" unless shoot(asteroids_large)[199] == [8,2]
+
+puts "Second part: #{shoot(asteroids).map { |x,y| 100 * x + y }[199]}"
 
 __END__
 .#..#..#..#...#..#...###....##.#....
