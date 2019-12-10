@@ -25,66 +25,42 @@ def read_input(input)
   asteroids
 end
 
-# return (a,b) where line is ax + b
-def line(ast1, ast2)
-  x1, y1 = ast1
-  x2, y2 = ast2
-  if x1 == x2
-    [x1, :vertical] # special case in case of vertical line
-  elsif y1 == y2
-    [0, y1]
-  else
-    a = (y2 - y1).to_f / (x2 - x1).to_f
-    b = y2 - a * x2
-    [a, b]
-  end
+def polar_coords(ref_ast, ast)
+  x1, y1 = ref_ast
+  x2, y2 = ast
+  r = Math.sqrt( (x2 - x1) ** 2 + (y2 - y1) ** 2)
+  angle = Math.atan2( (y2 - y1).to_f, (x2 - x1).to_f)
+  [angle, r]
 end
-
-class Symbol
-  def round(n)
-    self
-  end
-end
-
-def aligned?(ast1, ast2, ast3)
-  a1, b1 = line(ast1, ast2)
-  a2, b2 = line(ast1, ast3)
-  precision = 6
-  b1.round(precision) == b2.round(precision) && a1.round(precision) == a2.round(precision)
-end
-
-def distance(ast1, ast2)
-  x1, y1 = ast1
-  x2, y2 = ast2
-  (y2 - y1) ** 2 + (x2 - x1) ** 2 
-end
-
-def visible?(ast1, ast2, asteroids)
-  asteroids.reject { |ast| ast == ast1 || ast == ast2 }.none? do |ast3|
-    aligned?(ast1, ast2, ast3) &&
-      distance(ast1, ast3) < distance(ast1, ast2) &&
-      distance(ast2, ast3) < distance(ast1, ast2)
-  end
-end
-
-raise "Horizontal alignement" unless aligned?( [0,0], [1,0], [2,0])
-raise "Diagonal alignement" unless aligned?([0,0], [1,1], [2,2])
 
 def best_location(asteroids)
-  debug "#{asteroids.size} asteroids there"
   values = {}
   best = asteroids.max_by do |ast1|
-    c = asteroids.reject { |ast2| ast1 == ast2 }.count do |ast2|
-      v = visible?(ast1, ast2, asteroids)
-      debug2 "#{ast1.join(',')} -> #{ast2.join(',')} : #{v}"
-      v
-    end
-    debug "#{ast1.join(', ')}: #{c}"
-    values[ast1] = c
-    c
+    asteroids
+      .reject { |ast| ast == ast1 }
+      .map { |ast| polar_coords(ast1, ast) }
+      .group_by { |angle, r| angle.round(6) }
+      .size
+      .tap { |visible| values[ast1] = visible }
   end
   [best, values[best]]
 end
+
+#def best_location(asteroids)
+#  debug "#{asteroids.size} asteroids there"
+#  values = {}
+#  best = asteroids.max_by do |ast1|
+#    c = asteroids.reject { |ast2| ast1 == ast2 }.count do |ast2|
+#      v = visible?(ast1, ast2, asteroids)
+#      debug2 "#{ast1.join(',')} -> #{ast2.join(',')} : #{v}"
+#      v
+#    end
+#    debug "#{ast1.join(', ')}: #{c}"
+#    values[ast1] = c
+#    c
+#  end
+#  [best, values[best]]
+#end
 
 asteroids = read_input(<<~MAP)
 .#..#
@@ -94,7 +70,6 @@ asteroids = read_input(<<~MAP)
 ...##
 MAP
 raise "Failed example1" unless best_location(asteroids) == [[3,4], 8]
-
 
 asteroids = read_input(<<~MAP)
 ......#.#.
@@ -108,6 +83,7 @@ asteroids = read_input(<<~MAP)
 ##...#..#.
 .#....####
 MAP
+puts best_location(asteroids).join(':')
 raise "Failed example2" unless best_location(asteroids) == [[5,8], 33]
 
 asteroids = read_input(<<~MAP)
