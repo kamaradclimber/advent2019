@@ -9,7 +9,7 @@ def debug2(s)
 end
 
 class Moon
-  attr_reader :pos
+  attr_reader :pos, :velocity
 
   def initialize(x:,y:,z:)
     @pos = [x,y,z]
@@ -30,6 +30,10 @@ class Moon
     x1,y1,z1 = self.pos
     vx,vy,vz = @velocity
     @pos = [x1+vx, y1+vy,z1+vz]
+  end
+
+  def energy_detail
+    [pos.map(&:abs).sum, @velocity.map(&:abs).sum]
   end
 
   def energy
@@ -53,23 +57,23 @@ def parse(input)
   end
 end
 
-example = parse(<<~MOONS)
+example1 = parse(<<~MOONS)
 <x=-1, y=0, z=2>
 <x=2, y=-10, z=-7>
 <x=4, y=-8, z=8>
 <x=3, y=5, z=-1>
 MOONS
-10.times do round(example) end
-raise "Failed example1" unless 179 == example.map(&:energy).sum
+10.times do round(example1) end
+raise "Failed example1" unless 179 == example1.map(&:energy).sum
 
-example = parse(<<~MOONS)
+example2 = parse(<<~MOONS)
 <x=-8, y=-10, z=0>
 <x=5, y=5, z=10>
 <x=2, y=-7, z=3>
 <x=9, y=-8, z=-3>
 MOONS
-100.times do round(example) end
-raise "Failed example2" unless 1940 == example.map(&:energy).sum
+100.times do round(example2) end
+raise "Failed example2" unless 1940 == example2.map(&:energy).sum
 
 input = parse(<<~MOONS)
 <x=8, y=0, z=8>
@@ -79,3 +83,58 @@ input = parse(<<~MOONS)
 MOONS
 1000.times do round(input) end
 puts "First part: #{input.map(&:energy).sum}"
+
+def checksum(moons, dimension)
+  moons.map do |moon|
+    [moon.pos[dimension], moon.velocity[dimension]]
+  end.flatten.join(',')
+end
+
+
+example1 = parse(<<~MOONS)
+<x=-1, y=0, z=2>
+<x=2, y=-10, z=-7>
+<x=4, y=-8, z=8>
+<x=3, y=5, z=-1>
+MOONS
+
+def recurence(moons)
+  known_pos = {0 => {},1 => {}, 2 => {}}
+  known_frequency = {}
+  step = 0
+  loop do
+    #puts "Step #{step}"
+    3.times do |dimension|
+      check = checksum(moons, dimension)
+      if known_pos[dimension].key?(check) && !known_frequency.key?(dimension)
+        debug "Found recurrence on dimension #{dimension}: #{step - known_pos[dimension][check]}"
+        known_frequency[dimension] = [known_pos[dimension][check], step - known_pos[dimension][check]]
+      else
+        known_pos[dimension][check] = step
+      end
+    end
+    break if known_frequency.size == 3
+    step += 1
+    round(moons)
+  end
+  raise "Wrong assumption about cycle starting at step 0" unless known_frequency.values.map(&:first).all?(&:zero?)
+  known_frequency.values.map { |f| f[1] }.inject { |mem, el| mem.lcm(el) }
+end
+
+raise "Wrong example1" unless recurence(example1) == 2772
+
+example2 = parse(<<~MOONS)
+<x=-8, y=-10, z=0>
+<x=5, y=5, z=10>
+<x=2, y=-7, z=3>
+<x=9, y=-8, z=-3>
+MOONS
+raise "Wrong example2" unless recurence(example2) == 4686774924
+
+input = parse(<<~MOONS)
+<x=8, y=0, z=8>
+<x=0, y=-5, z=-10>
+<x=16, y=10, z=-5>
+<x=19, y=-10, z=-7>
+MOONS
+puts "Second part: #{recurence(input)}"
