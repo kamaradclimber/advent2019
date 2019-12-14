@@ -26,9 +26,9 @@ def read(ingredient)
   [$1.to_i, $2] if ingredient =~ /^(\d+) (.+)$/
 end
 
-def run(recipe)
+def run(recipe, target: 1)
   needs = {}
-  needs['FUEL'] = 1
+  needs['FUEL'] = target
   while needs.any? { |ingredient, required| required > 0 && ingredient != 'ORE'}
     debug needs.map { |i,r| "#{i}: #{r}" }.join(', ')
     ingredient, required = needs.find { |i, r| r > 0 && i != 'ORE'}
@@ -188,3 +188,34 @@ input = read_input(<<~RECIPE)
 RECIPE
 
 puts "First part: #{run(input)}"
+
+def dicho(input)
+  low_candidate = 1
+  candidate = 10
+  high_candidate = nil
+
+  loop do
+    debug "Trying to produce #{candidate}. Candidate range: [#{low_candidate} #{high_candidate}]"
+    ore_required = run(input, target: candidate)
+    if ore_required < 1000000000000
+      low_candidate = candidate
+      candidate *= 2
+      debug "Increasing candidate to #{candidate}"
+    elsif ore_required > 1000000000000
+      high_candidate = candidate
+      candidate = (high_candidate + low_candidate) / 2
+      debug "Decreasing candidate to #{candidate}"
+    else
+      return candidate
+    end
+    if high_candidate && (high_candidate - low_candidate <= 1)
+      return low_candidate
+    end
+  end
+end
+
+raise "Failed part2 example5" unless dicho(example5) == 460664
+raise "Failed part2 example4" unless dicho(example4) == 5586022
+raise "Failed part2 example3" unless dicho(example3) == 82892753
+
+puts "Part2: #{dicho(input)}"
