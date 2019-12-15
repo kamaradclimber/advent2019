@@ -183,10 +183,14 @@ end
 
 class Maze
   def initialize
-    @map = {}
     @current_position = [0,0]
+    reset!
+  end
+
+  def reset!
+    @map = {}
     @previous_positions = []
-    @map[[0,0]] = {wall: false, distance: 0}
+    @map[@current_position] = {wall: false, distance: 0}
   end
 
   def <<(el)
@@ -204,6 +208,8 @@ class Maze
       unless @map.key?(@current_position)
         new_distance = @map[@previous_positions.reverse.find { |pos| pos != @current_position }][:distance] + 1
         @map[@current_position] = { wall: false, distance: new_distance, oxygen: true}
+        puts "First part: #{new_distance}"
+        reset!
       end
     else
       raise "Unknown output #{el}"
@@ -251,8 +257,8 @@ class Maze
     @map.key?(pos)
   end
 
-  def distance_oxygen
-    @map.values.find{ |meta| meta[:oxygen] }[:distance]
+  def max_distance
+    @map.values.map { |meta| meta[:distance] || 0 }.max
   end
 
   def print_map
@@ -293,7 +299,8 @@ begin
   iterate(input_copy, stdin: m, stdout: m)
 rescue StopProgram
 end
-puts "First part: #{m.distance_oxygen}"
+
+puts m.max_distance
 
 
 __END__
