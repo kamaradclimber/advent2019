@@ -194,7 +194,7 @@ class InOut
 
 
   def pop
-    @input.pop
+    @input.pop # this is buggy, it should be shift
   end
 
   def empty?
@@ -203,23 +203,70 @@ class InOut
 end
 
 shape = {}
-(0..49).each do |x|
-  (0..49).each do |y|
-    #puts "#{x} #{y}"
+simple_shape = []
+(0..6).each do |y|
+  (0..100).each do |x|
     input_copy = input.dup # reset program
     m = InOut.new(x,y)
     #ENV['DEBUG2'] = ''
     iterate(input_copy, stdin: m, stdout: m)
     shape[[x,y]] = true if m.out == 1
   end
+  min_x = shape.keys.select { |a,b| b == y }.map(&:first).min
+  max_x = shape.keys.select { |a,b| b == y }.map(&:first).max
+  simple_shape << (min_x..max_x)
+  puts "#{y} #{(min_x..max_x)}"
 end
+puts "First part #{shape.count { |_,v| v }}"
+puts "First part #{simple_shape.map { |r| r.size }.compact.sum}"
 
-puts shape.size
+def discover_shape(input, simple_shape)
+  square_size = 100
 
+  while true
+    y = simple_shape.size - 1
+    range = simple_shape.last
+    puts "Trying #{y+1}, last shape (line above) is #{range}"
+    min_x = range.begin
+    max_x = range.end
 
-(0..49).each do |y|
-  (0..49).each do |x|
-    print(shape[[x,y]] ? "#" : " ")
+    candidates = [[min_x, y+1],[min_x+1,y+1] ,[min_x+2,y+1], [min_x+3,y+1]]
+    min_xx, _= candidates.find do |a,b|
+      input_copy = input.dup # reset program
+      m = InOut.new(a,b)
+      iterate(input_copy, stdin: m, stdout: m)
+      m.out == 1
+    end
+    candidates = [[max_x, y+1],[max_x+1,y+1],[max_x+2,y+1],[max_x+3,y+1]].reverse
+    max_xx, _= candidates.find do |a,b|
+      input_copy = input.dup # reset program
+      m = InOut.new(a,b)
+      iterate(input_copy, stdin: m, stdout: m)
+      m.out == 1
+    end
+    simple_shape << (min_xx..max_xx)
+
+    #puts "#{y+1}: #{simple_shape.last}"
+
+    upper_y = y+1-(square_size-1)
+    if upper_y >= 0
+      if (simple_shape[upper_y].size||0) >= square_size
+        common_xes = simple_shape[upper_y].to_a & simple_shape[y+1].to_a
+        #puts "y:#{upper_y} -> y:#{y+1}: size of #{square_size} lines above is #{simple_shape[upper_y].size}. Ranges are #{simple_shape[y+1]} and #{simple_shape[upper_y]}. Intersection size is #{common_xes.size}"
+        if common_xes.size  >= square_size
+          return common_xes.first + upper_y * 10000
+        end
+      end
+    end
   end
-  puts
 end
+puts discover_shape(input,simple_shape)
+
+#(0..30).each do |y|
+#  (0..50).each do |x|
+#    print((simple_shape[y] && simple_shape[y].size && simple_shape[y].include?(x)) ? "#" : ".")
+#  end
+#  puts
+#end
+
+
