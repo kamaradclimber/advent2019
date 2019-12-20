@@ -339,11 +339,11 @@ def outer_to_inner_distances(maze, portals)
     distance_from_outer = update_distances_no_portal(maze, names["outer_#{name}"])
     meta_distances[["outer_#{name}", "inner_#{name}"]] = 1 # going through portal
     names.each do |dest, point|
-      meta_distances[["outer_#{name}", dest]] = distance_from_outer[point] unless "outer_#{name}" == dest
+      meta_distances[["outer_#{name}", dest]] = distance_from_outer[point] unless "inner_#{name}" == dest
     end
     distance_from_inner = update_distances_no_portal(maze, names["inner_#{name}"])
     names.each do |dest, point|
-      meta_distances[["inner_#{name}", dest]] = distance_from_inner[point] unless "inner_#{name}" == dest
+      meta_distances[["inner_#{name}", dest]] = distance_from_inner[point] unless "outer_#{name}" == dest
     end
   end
   distance_from_AA = update_distances_no_portal(maze, portals['AA'].first)
