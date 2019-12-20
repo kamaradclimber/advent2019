@@ -430,9 +430,6 @@ def update_distances_graph(graph, starting_point)
     neighbours_graph[point].each do |candidate|
       binding.pry if debug2? && ENV['TOTO']
       next if visited[candidate]
-      current_dist = distances[candidate]
-      d = graph[[point,candidate]] || graph[[candidate,point]]
-      new_inception = inception
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         case candidate
         when /^inner_/
@@ -447,9 +444,13 @@ def update_distances_graph(graph, starting_point)
         debug "Skipping #{point} because it does not exist at this inception level"
         next
       end
+      current_dist = distances[candidate]
+      d = graph[[point,candidate]] || graph[[candidate,point]]
+      new_inception = inception
       best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate + 'x' * new_inception] = best_dist
       debug "Best distance between #{candidate} (#{new_inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
+      debug "Adding #{candidate + 'x' * (new_inception)} as non visited (unless it was already visited)"
       visited[candidate + 'x' * (new_inception)] ||= false
     end
     remaining_to_explore = distances.select { |point, d| visited[point] == false }
