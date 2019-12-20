@@ -421,6 +421,7 @@ def update_distances_graph(graph, starting_point)
     debug2 "#{to_explore.size} points to explore: #{to_explore.first}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
     point = to_explore.first
     inception = $1.size if point =~ /(x*)$/
+    point = point.gsub(/(x*)$/, '')
     debug "Visiting #{point} (inception level: #{inception})"
     puts "Visiting #{point} (inception level: #{inception})"
     neighbours_graph[point].each do |candidate|
