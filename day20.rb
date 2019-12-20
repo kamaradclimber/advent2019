@@ -281,7 +281,7 @@ AA....#.....#...#...#...#.#                                                     
                              F             C F       K     D         Q       G                               
 INPUT
 
-debug2!
+#debug2!
 #distances = update_distances(maze3, portals3['AA'].first, portals3)
 #puts "First part: #{distances[portals3['ZZ'].first]}"
 
