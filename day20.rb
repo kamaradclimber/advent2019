@@ -420,14 +420,25 @@ def update_distances_graph(graph, starting_point)
       .min_by { |point, _| distances[point]}
     debug2 "#{to_explore.size} points to explore: #{to_explore.first}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
     point = to_explore.first
-    debug "Visiting #{point}"
+    inception = $1.size if point =~ /(x*)$/
+    debug "Visiting #{point} (inception level: #{inception})"
     neighbours_graph[point].each do |candidate|
       next if visited[candidate]
       current_dist = distances[candidate]
       d = graph[[point,candidate]] || graph[[candidate,point]]
       best_dist = [current_dist, distances[point] + d].compact.min
-      distances[candidate] = best_dist
+      distances[candidate + 'x' * inception] = best_dist
       debug "Best distance between #{candidate} and #{starting_point} is (for now) #{distances[candidate]}"
+      case candidate
+      when /^inner_/
+        neighbours_graph[candidate].each do |new_candidate|
+          visited[new_candidate + 'x' * (inception+1)] ||= false
+        end
+      when /^outer_/
+        neighbours_graph[candidate].each do |new_candidate|
+          visited[new_candidate + 'x' * (inception-1)] ||= false
+        end
+      end
     end
     remaining_to_explore = distances.select { |point, d| visited[point] == false }
     if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
