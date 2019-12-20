@@ -350,7 +350,9 @@ def outer_to_inner_distances(maze, portals)
   meta_distances[['AA', 'ZZ']] = distance_from_AA[portals['ZZ'].first]
   portals.each do |dest, coords|
     inner = coords.min_by { |point| distance_to_maze_center(point, maze) }
-    meta_distances[['AA', dest]] = distance_from_AA[inner]
+    outer = coords.max_by { |point| distance_to_maze_center(point, maze) }
+    meta_distances[['AA', "inner_#{dest}"]] = distance_from_AA[inner]
+    meta_distances[['AA', "outer_#{dest}"]] = distance_from_AA[outer]
   end
   meta_distances
 end
