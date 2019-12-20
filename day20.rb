@@ -337,9 +337,9 @@ def outer_to_inner_distances(maze, portals)
 
   portals.select { |name, coords| coords.size > 1 }.each do |name, coords|
     distance_from_outer = update_distances_no_portal(maze, names["outer_#{name}"])
-    meta_distances["outer_#{name}"] = {}
+    meta_distances["outer_#{name}", "inner_#{name}"] = 1 # going through portal
     names.each do |dest, point|
-      meta_distances["outer_#{name}"][dest] = distance_from_outer[point] unless "outer_#{name}" == dest
+      meta_distances["outer_#{name}", dest] = distance_from_outer[point] unless "outer_#{name}" == dest
     end
   end
   meta_distances
@@ -348,3 +348,36 @@ end
 meta1 = outer_to_inner_distances(maze1, portals1)
 binding.pry
 puts '1'
+
+def update_distances_no_portal(maze, starting_point)
+  infinity = 100000000
+  distances = Hash.new(infinity)
+  debug "Starting point #{starting_point.join(',')}: #{maze[starting_point]}"
+  visited = {}
+  maze.each {|p,el| visited[p] = false }
+  distances[starting_point] = 0
+  while visited.any? { |_,v| !v }
+    to_explore = visited
+      .reject { |point, v| v }
+      .min_by { |point, _| distances[point]}
+    debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{maze.size} points visited"
+    point = to_explore.first
+    debug "Visiting #{point.join(',')}"
+
+    neighbours(point, maze, {}).each do |candidate|
+      next if visited[candidate]
+      current_dist = distances[candidate]
+      best_dist = [current_dist, distances[point] + 1].compact.min
+      distances[candidate] = best_dist
+      debug "Best distance between #{candidate.join(',')} and #{starting_point.join(',')} is (for now) #{distances[candidate]}"
+    end
+    remaining_to_explore = distances.select { |point, d| visited[point] == false }
+    if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
+      debug "End of reachable points"
+      return distances
+    end
+
+    visited[point] = true
+  end
+  distances
+end
