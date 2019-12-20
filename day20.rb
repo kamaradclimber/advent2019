@@ -427,6 +427,7 @@ def update_distances_graph(graph, starting_point)
     point = point.gsub(/(x*)$/, '')
     binding.pry if debug2?
     neighbours_graph[point].each do |candidate|
+      binding.pry if debug2? && ENV['TOTO']
       next if visited[candidate]
       current_dist = distances[candidate]
       d = graph[[point,candidate]] || graph[[candidate,point]]
