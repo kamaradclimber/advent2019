@@ -409,8 +409,10 @@ def update_distances_graph(graph, starting_point)
     a,b = edge
     neighbours_graph[a] ||= []
     neighbours_graph[a] << b
+    neighbours_graph[a] = neighbours_graph[a].uniq
     neighbours_graph[b] ||= []
     neighbours_graph[b] << a
+    neighbours_graph[b] = neighbours_graph[b].uniq
   end
   neighbours_graph.keys.each {|p| visited[p] = false }
   distances[starting_point] = 0
