@@ -436,6 +436,7 @@ def update_distances_graph(graph, starting_point)
           visited[new_candidate + 'x' * (inception+1)] ||= false
         end
       when /^outer_/
+        binding.pry if inception == 0
         neighbours_graph[candidate].each do |new_candidate|
           visited[new_candidate + 'x' * (inception-1)] ||= false
         end
