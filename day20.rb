@@ -63,7 +63,7 @@ def neighbours(point,maze, portals)
     end
   end
   if maze[point] =~ /^[A-Z]{2}$/
-    neighs += portals[maze[point]].reject { |el| el == point }
+    neighs += portals[maze[point]].reject { |el| el == point } if portals[maze[point]]
   end
   neighs
 end
