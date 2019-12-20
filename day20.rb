@@ -449,12 +449,8 @@ def update_distances_graph(graph, starting_point)
       end
       best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate + 'x' * new_inception] = best_dist
-      debug "Best distance between #{candidate} (#{inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
-      if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
-        neighbours_graph[candidate].each do |new_candidate|
-          visited[new_candidate + 'x' * (new_inception)] ||= false
-        end
-      end
+      debug "Best distance between #{candidate} (#{new_inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
+      visited[candidate + 'x' * (new_inception)] ||= false
     end
     remaining_to_explore = distances.select { |point, d| visited[point] == false }
     if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
