@@ -398,34 +398,35 @@ RE....#.#                           #......RF
                A A D   M
 INPUT
 
-meta1 = outer_to_inner_distances(maze1, portals1)
-meta2 = outer_to_inner_distances(maze2, portals2)
-meta4 = outer_to_inner_distances(maze4, portals4)
-
-binding.pry
-puts '1'
-
-def update_distances_no_portal(maze, starting_point)
+def update_distances_graph(graph, starting_point)
   infinity = 100000000
   distances = Hash.new(infinity)
-  debug "Starting point #{starting_point.join(',')}: #{maze[starting_point]}"
+  debug "Starting point #{starting_point}"
   visited = {}
-  maze.each {|p,el| visited[p] = false }
+  neighbours_graph = {}
+  graph.each do |edge, cost|
+    a,b = edge
+    neighbours_graph[a] ||= []
+    neighbours_graph[a] << b
+    neighbours_graph[b] ||= []
+    neighbours_graph[b] << a
+  end
+  neighbours_graph.keys.each {|p| visited[p] = false }
   distances[starting_point] = 0
   while visited.any? { |_,v| !v }
     to_explore = visited
       .reject { |point, v| v }
       .min_by { |point, _| distances[point]}
-    debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{maze.size} points visited"
+    debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
     point = to_explore.first
-    debug "Visiting #{point.join(',')}"
-
-    neighbours(point, maze, {}).each do |candidate|
+    debug "Visiting #{point}"
+    neighbours_graph[point].each do |candidate|
       next if visited[candidate]
       current_dist = distances[candidate]
-      best_dist = [current_dist, distances[point] + 1].compact.min
+      d = graph[[point,candidate]] || graph[[candidate,point]]
+      best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate] = best_dist
-      debug "Best distance between #{candidate.join(',')} and #{starting_point.join(',')} is (for now) #{distances[candidate]}"
+      debug "Best distance between #{candidate} and #{starting_point} is (for now) #{distances[candidate]}"
     end
     remaining_to_explore = distances.select { |point, d| visited[point] == false }
     if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
@@ -437,3 +438,12 @@ def update_distances_no_portal(maze, starting_point)
   end
   distances
 end
+
+meta1 = outer_to_inner_distances(maze1, portals1)
+meta2 = outer_to_inner_distances(maze2, portals2)
+meta4 = outer_to_inner_distances(maze4, portals4)
+
+update_distances_graph(meta2, 'AA')
+
+binding.pry
+puts '1'
