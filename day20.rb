@@ -284,3 +284,15 @@ INPUT
 debug2!
 distances = update_distances(maze, portals['AA'].first, portals)
 puts "First part: #{distances[portals['ZZ'].first]}"
+
+def distance_to_maze_center(point, maze)
+  middle_x, middle_y = maze.max_
+end
+
+# return a distances from an outer portal to its inner version
+def outer_to_inner_distances(maze, portals)
+  meta_distances = {}
+  portals.select { |name, coords| coords.size > 1 }.each do |name, coords|
+
+  end
+end
