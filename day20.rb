@@ -297,7 +297,7 @@ def update_distances_no_portal(maze, starting_point)
       .reject { |point, v| v }
       .min_by { |point, _| distances[point]}
     debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{maze.size} points visited"
-    x,y = point = to_explore.first
+    point = to_explore.first
     debug "Visiting #{point.join(',')}"
 
     neighbours(point, maze, {}).each do |candidate|
@@ -339,7 +339,7 @@ def outer_to_inner_distances(maze, portals)
     distance_from_outer = update_distances_no_portal(maze, names["outer_#{name}"])
     meta_distances["outer_#{name}"] = {}
     names.each do |dest, point|
-      meta_distances["outer_#{name}"]["inner_#{dest}"] = distance_from_outer[point]
+      meta_distances["outer_#{name}"][dest] = distance_from_outer[point] unless "outer_#{name}" == dest
     end
   end
   meta_distances
