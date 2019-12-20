@@ -456,7 +456,7 @@ def update_distances_graph(graph, starting_point)
       return distances
     end
 
-    visited[point] = true
+    visited[point + 'x' * inception] = true
   end
   distances
 end
