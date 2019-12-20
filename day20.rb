@@ -425,6 +425,7 @@ def update_distances_graph(graph, starting_point)
     point = to_explore.first
     inception = $1.size if point =~ /(x*)$/
     debug "Visiting #{point} (inception level: #{inception})"
+    full_point_name = point
     point = point.gsub(/(x*)$/, '')
     binding.pry if debug2?
     neighbours_graph[point].each do |candidate|
@@ -447,7 +448,7 @@ def update_distances_graph(graph, starting_point)
       end
       current_dist = distances[candidate]
       d = graph[[point,candidate]] || graph[[candidate,point]]
-      best_dist = [current_dist, distances[point + 'x' *new_inception] + d].compact.min
+      best_dist = [current_dist, distances[full_point_name] + d].compact.min
       distances[candidate + 'x' * new_inception] = best_dist
       debug "Best distance between #{candidate} (#{new_inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
       debug "Adding #{candidate + 'x' * (new_inception)} as non visited (unless it was already visited)"
