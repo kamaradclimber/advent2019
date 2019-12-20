@@ -338,8 +338,8 @@ def outer_to_inner_distances(maze, portals)
   portals.select { |name, coords| coords.size > 1 }.each do |name, coords|
     distance_from_outer = update_distances_no_portal(maze, names["outer_#{name}"])
     meta_distances["outer_#{name}"] = {}
-    names.each do |name, point|
-      meta_distances["outer_#{name}"]["inner_#{name}"] = distance_from_outer[point]
+    names.each do |dest, point|
+      meta_distances["outer_#{name}"]["inner_#{dest}"] = distance_from_outer[point]
     end
   end
   meta_distances
