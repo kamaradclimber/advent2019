@@ -471,7 +471,7 @@ meta4 = outer_to_inner_distances(maze4, portals4)
 
 debug!
 #a = update_distances_graph(meta1, 'AA')
-debug2!
+#debug2!
 a = update_distances_graph(meta4, 'AA')
 
 binding.pry
