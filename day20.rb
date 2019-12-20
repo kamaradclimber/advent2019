@@ -420,33 +420,33 @@ def update_distances_graph(graph, starting_point)
     to_explore = visited
       .reject { |point, v| v }
       .min_by { |point, _| distances[point]}
-    debug2 "#{to_explore.size} points to explore: #{to_explore.first}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
+    #debug2 "#{to_explore.size} points to explore: #{to_explore.first}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
     point = to_explore.first
     inception = $1.size if point =~ /(x*)$/
     point = point.gsub(/(x*)$/, '')
     debug "Visiting #{point} (inception level: #{inception})"
-    binding.pry if debug?
+    binding.pry if debug2?
     neighbours_graph[point].each do |candidate|
-      inception = $1.size if point =~ /(x*)$/ # recomputing inception at each iteration
       next if visited[candidate]
       current_dist = distances[candidate]
       d = graph[[point,candidate]] || graph[[candidate,point]]
+      new_inception = inception
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         case candidate
         when /^inner_/
           debug "Moving up"
-          inception -= 1
+          new_inception -= 1
         when /^outer_/
           debug "Moving down"
-          inception += 1
+          new_inception += 1
         end
       end
       best_dist = [current_dist, distances[point] + d].compact.min
-      distances[candidate + 'x' * inception] = best_dist
-      debug "Best distance between #{candidate} (#{inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * inception]}" unless distances[candidate + 'x' *inception] == distances.default
+      distances[candidate + 'x' * new_inception] = best_dist
+      debug "Best distance between #{candidate} (#{inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         neighbours_graph[candidate].each do |new_candidate|
-          visited[new_candidate + 'x' * (inception)] ||= false
+          visited[new_candidate + 'x' * (new_inception)] ||= false
         end
       end
     end
@@ -467,7 +467,7 @@ meta4 = outer_to_inner_distances(maze4, portals4)
 
 debug!
 a = update_distances_graph(meta1, 'AA')
-debug!
+debug2!
 a = update_distances_graph(meta4, 'AA')
 
 binding.pry
