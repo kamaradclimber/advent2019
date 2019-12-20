@@ -430,7 +430,7 @@ def update_distances_graph(graph, starting_point)
     binding.pry if debug2?
     neighbours_graph[point].each do |candidate|
       binding.pry if debug2? && ENV['TOTO']
-      next if visited[candidate]
+      next if visited[candidate + 'x' * inception]
       new_inception = inception
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         case candidate
