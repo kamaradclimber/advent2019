@@ -422,6 +422,7 @@ def update_distances_graph(graph, starting_point)
     point = to_explore.first
     inception = $1.size if point =~ /(x*)$/
     debug "Visiting #{point} (inception level: #{inception})"
+    puts "Visiting #{point} (inception level: #{inception})"
     neighbours_graph[point].each do |candidate|
       next if visited[candidate]
       current_dist = distances[candidate]
