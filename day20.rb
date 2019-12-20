@@ -342,6 +342,7 @@ def outer_to_inner_distances(maze, portals)
       meta_distances[["outer_#{name}", dest]] = distance_from_outer[point] unless "outer_#{name}" == dest
     end
   end
+  meta_distances[['AA', 'ZZ']] = update_distances_no_portal(maze, portals['AA'].first)[portals['ZZ'].first]
   meta_distances
 end
 
