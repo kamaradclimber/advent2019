@@ -347,6 +347,7 @@ def outer_to_inner_distances(maze, portals)
 end
 
 meta1 = outer_to_inner_distances(maze1, portals1)
+meta2 = outer_to_inner_distances(maze2, portals2)
 binding.pry
 puts '1'
 
