@@ -430,6 +430,7 @@ def update_distances_graph(graph, starting_point)
     neighbours_graph[point].each do |candidate|
       binding.pry if debug2? && ENV['TOTO']
       next if visited[candidate]
+      new_inception = inception
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         case candidate
         when /^inner_/
@@ -446,7 +447,6 @@ def update_distances_graph(graph, starting_point)
       end
       current_dist = distances[candidate]
       d = graph[[point,candidate]] || graph[[candidate,point]]
-      new_inception = inception
       best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate + 'x' * new_inception] = best_dist
       debug "Best distance between #{candidate} (#{new_inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
