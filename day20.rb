@@ -406,6 +406,7 @@ def update_distances_graph(graph, starting_point)
   visited = {}
   neighbours_graph = {}
   graph.each do |edge, cost|
+    next if cost == graph.default
     a,b = edge
     neighbours_graph[a] ||= []
     neighbours_graph[a] << b
