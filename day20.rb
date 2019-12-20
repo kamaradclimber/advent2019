@@ -429,7 +429,7 @@ def update_distances_graph(graph, starting_point)
       d = graph[[point,candidate]] || graph[[candidate,point]]
       best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate + 'x' * inception] = best_dist
-      debug "Best distance between #{candidate} and #{starting_point} is (for now) #{distances[candidate]}"
+      debug "Best distance between #{candidate} (#{inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * inception]}"
       case candidate
       when /^inner_/
         neighbours_graph[candidate].each do |new_candidate|
