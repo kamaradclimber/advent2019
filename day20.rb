@@ -425,6 +425,7 @@ def update_distances_graph(graph, starting_point)
     inception = $1.size if point =~ /(x*)$/
     point = point.gsub(/(x*)$/, '')
     debug "Visiting #{point} (inception level: #{inception})"
+    binding.pry if debug?
     neighbours_graph[point].each do |candidate|
       next if visited[candidate]
       current_dist = distances[candidate]
@@ -464,8 +465,9 @@ meta1 = outer_to_inner_distances(maze1, portals1)
 meta2 = outer_to_inner_distances(maze2, portals2)
 meta4 = outer_to_inner_distances(maze4, portals4)
 
-debug!
 a = update_distances_graph(meta1, 'AA')
+debug!
+a = update_distances_graph(meta4, 'AA')
 
 binding.pry
 puts '1'
