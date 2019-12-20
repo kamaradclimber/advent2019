@@ -104,7 +104,7 @@ end
 
 
 
-maze, portals = parse_input(<<~INPUT)
+maze1, portals1 = parse_input(<<~INPUT)
          A
          A
   #######.#########
@@ -126,10 +126,10 @@ FG..#########.....#
              Z
 INPUT
 
-distances = update_distances(maze, portals['AA'].first, portals)
-raise "Failed example1" unless distances[portals['ZZ'].first] == 23
+distances = update_distances(maze1, portals1['AA'].first, portals1)
+raise "Failed example1" unless distances[portals1['ZZ'].first] == 23
 
-maze, portals = parse_input(<<~INPUT)
+maze2, portals2 = parse_input(<<~INPUT)
                    A               
                    A               
   #################.#############  
@@ -169,11 +169,11 @@ YN......#               VT..#....QG
            U   P   P               
 INPUT
 
-distances = update_distances(maze, portals['AA'].first, portals)
-raise "Failed example2" unless distances[portals['ZZ'].first] == 58
+distances = update_distances(maze2, portals2['AA'].first, portals2)
+raise "Failed example2" unless distances[portals2['ZZ'].first] == 58
 
 
-maze, portals = parse_input(<<~INPUT)
+maze3, portals3 = parse_input(<<~INPUT)
                                    E   X       V       B       J       K   G                                 
                                    Q   B       S       B       F       G   C                                 
   #################################.###.#######.#######.#######.#######.###.###############################  
@@ -282,17 +282,69 @@ AA....#.....#...#...#...#.#                                                     
 INPUT
 
 debug2!
-distances = update_distances(maze, portals['AA'].first, portals)
-puts "First part: #{distances[portals['ZZ'].first]}"
+#distances = update_distances(maze3, portals3['AA'].first, portals3)
+#puts "First part: #{distances[portals3['ZZ'].first]}"
+
+def update_distances_no_portal(maze, starting_point)
+  infinity = 100000000
+  distances = Hash.new(infinity)
+  debug "Starting point #{starting_point.join(',')}: #{maze[starting_point]}"
+  visited = {}
+  maze.each {|p,el| visited[p] = false }
+  distances[starting_point] = 0
+  while visited.any? { |_,v| !v }
+    to_explore = visited
+      .reject { |point, v| v }
+      .min_by { |point, _| distances[point]}
+    debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{maze.size} points visited"
+    x,y = point = to_explore.first
+    debug "Visiting #{point.join(',')}"
+
+    neighbours(point, maze, {}).each do |candidate|
+      next if visited[candidate]
+      current_dist = distances[candidate]
+      best_dist = [current_dist, distances[point] + 1].compact.min
+      distances[candidate] = best_dist
+      debug "Best distance between #{candidate.join(',')} and #{starting_point.join(',')} is (for now) #{distances[candidate]}"
+    end
+    remaining_to_explore = distances.select { |point, d| visited[point] == false }
+    if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
+      debug "End of reachable points"
+      return distances
+    end
+
+    visited[point] = true
+  end
+  distances
+end
 
 def distance_to_maze_center(point, maze)
-  middle_x, middle_y = maze.max_
+  middle_x, middle_y = maze.map { |p,_| p[0] }.max / 2, maze.map { |p,_| p[1] }.max / 2
+  x, y = point
+  (x - middle_x).abs + (y - middle_y).abs
 end
 
 # return a distances from an outer portal to its inner version
 def outer_to_inner_distances(maze, portals)
   meta_distances = {}
+  names = {}
   portals.select { |name, coords| coords.size > 1 }.each do |name, coords|
-
+    outer = coords.max_by { |point| distance_to_maze_center(point, maze) }
+    inner = coords.min_by { |point| distance_to_maze_center(point, maze) }
+    names["outer_#{name}"] = outer
+    names["inner_#{name}"] = inner
   end
+
+  portals.select { |name, coords| coords.size > 1 }.each do |name, coords|
+    distance_from_outer = update_distances_no_portal(maze, names["outer_#{name}"])
+    meta_distances["outer_#{name}"] = {}
+    names.each do |name, point|
+      meta_distances["outer_#{name}"]["inner_#{name}"] = distance_from_outer[point]
+    end
+  end
+  meta_distances
 end
+
+meta1 = outer_to_inner_distances(maze1, portals1)
+binding.pry
+puts '1'
