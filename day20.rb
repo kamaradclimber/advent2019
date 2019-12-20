@@ -441,6 +441,10 @@ def update_distances_graph(graph, starting_point)
           new_inception += 1
         end
       end
+      if new_inception < 0
+        debug "Skipping #{point} because it does not exist at this inception level"
+        next
+      end
       best_dist = [current_dist, distances[point] + d].compact.min
       distances[candidate + 'x' * new_inception] = best_dist
       debug "Best distance between #{candidate} (#{inception}) and #{starting_point} is (for now) #{distances[candidate + 'x' * new_inception]}" unless distances[candidate + 'x' *new_inception] == distances.default
