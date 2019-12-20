@@ -454,7 +454,7 @@ def update_distances_graph(graph, starting_point)
       visited[candidate + 'x' * (new_inception)] ||= false
     end
     remaining_to_explore = distances.select { |point, d| visited[point] == false }
-    if remaining_to_explore.empty? # || remaining_to_explore.values.min >= distances.default 
+    if remaining_to_explore.empty? || remaining_to_explore.values.min >= distances.default 
       debug "End of reachable points"
       return distances
     end
