@@ -417,7 +417,7 @@ def update_distances_graph(graph, starting_point)
     to_explore = visited
       .reject { |point, v| v }
       .min_by { |point, _| distances[point]}
-    debug2 "#{to_explore.size} points to explore: #{to_explore.first.join(',')}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
+    debug2 "#{to_explore.size} points to explore: #{to_explore.first}. #{visited.count { |_,v| v }}/~#{graph.size} points visited"
     point = to_explore.first
     debug "Visiting #{point}"
     neighbours_graph[point].each do |candidate|
