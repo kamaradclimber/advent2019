@@ -435,10 +435,10 @@ def update_distances_graph(graph, starting_point)
       if candidate.gsub(/.+_/, '') == point.gsub(/.+_/, '')
         case candidate
         when /^inner_/
-          debug "Moving up"
+          debug "  Moving up"
           new_inception -= 1
         when /^outer_/
-          debug "Moving down"
+          debug "  Moving down"
           new_inception += 1
         end
       end
