@@ -300,4 +300,4 @@ re = RecursiveEris.new(<<~MAP)
 #.###
 .####
 MAP
-puts "Part 2 : #{re.n_updates(200)}"
+puts "Part 2 : #{re.n_updates(1000)}"
